@@ -8,24 +8,8 @@ AliveStack demonstrates real-world microservices architecture using six differen
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    React Frontend (3000)                     │
-│              Pet visualization & control panel               │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ HTTP
-┌─────────────────────────────▼───────────────────────────────┐
-│                 Node.js API Gateway (3001)                   │
-│              "Pet Brain" - Central Orchestrator              │
-└──┬──────────┬──────────┬──────────┬──────────┬─────────────┘
-   │          │          │          │          │
-   ▼          ▼          ▼          ▼          ▼
-┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐
-│Python│  │ Rust │  │  Go  │  │ C++  │  │ Java │
-│Metrics│ │Valid.│  │ Load │  │Chaos │  │Rules │
-│ 8000 │  │ 8001 │  │ 8002 │  │ 8003 │  │ 8080 │
-└──────┘  └──────┘  └──────┘  └──────┘  └──────┘
-```
+<img width="1535" height="758" alt="image" src="https://github.com/user-attachments/assets/b762de6c-9ad0-4a54-996c-0f49c6c38f98" />
+
 
 ## Services
 
