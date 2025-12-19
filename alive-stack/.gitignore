@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+target/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.o
+*.a
+*.so
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment
+.env
+.env.local
+*.log
+
+# Docker
+.docker/
+
+# Go
+tmp/
+*.exe
+
+# Rust
+Cargo.lock
+
+# Java
+*.class
+*.jar
+.mvn/

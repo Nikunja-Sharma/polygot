@@ -1,0 +1,22 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install curl for healthcheck and nodemon for hot reload
+RUN apk add --no-cache curl
+RUN npm install -g nodemon
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Expose port
+EXPOSE 3001
+
+# Start with nodemon for hot reload
+CMD ["nodemon", "--watch", "src", "src/index.js"]

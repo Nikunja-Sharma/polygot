@@ -1,0 +1,24 @@
+# Development Dockerfile with air for hot reload
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+# Install git, curl, and air v1.61.1 (last version supporting Go 1.23)
+RUN apk add --no-cache git curl && \
+    go install github.com/air-verse/air@v1.61.1
+
+# Copy go mod files and source
+COPY go.mod go.sum* ./
+COPY *.go ./
+
+# Download dependencies and ensure go.sum is complete
+RUN go mod tidy && go mod download
+
+# Copy air config
+COPY .air.toml ./
+
+# Source will be mounted via volume
+EXPOSE 8002
+
+# Run go mod tidy before air to ensure dependencies are available
+CMD ["sh", "-c", "go mod tidy && air -c .air.toml"]

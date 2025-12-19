@@ -1,0 +1,149 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and Docker configuration
+  - [x] 1.1 Create root project structure with all service directories
+    - Create `alive-stack/` root with subdirectories for each service
+    - Create placeholder README.md with project overview
+    - _Requirements: 8.1, 8.5_
+  - [x] 1.2 Create docker-compose.yml with all services
+    - Define all 7 services with correct ports and dependencies
+    - Configure shared network `alive-stack-network`
+    - Set resource limits (1 CPU, 512MB per container)
+    - Add health checks for each service
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+
+- [x] 2. Implement Python Metrics Analyzer
+  - [x] 2.1 Create Python service with FastAPI
+    - Create `metrics-python/main.py` with FastAPI app
+    - Implement `/metrics` endpoint returning CPU and memory stats using psutil
+    - Implement `/health` endpoint
+    - Add status classification logic (NORMAL, HIGH, CRITICAL)
+    - Implement rolling average calculation for last 10 readings
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+  - [x] 2.2 Create Python Dockerfile and requirements.txt
+    - Create requirements.txt with fastapi, uvicorn, psutil
+    - Create multi-stage Dockerfile for minimal image size
+    - _Requirements: 8.1_
+
+- [x] 3. Implement Rust Health Validator
+  - [x] 3.1 Create Rust service with Axum
+    - Create `validator-rust/src/main.rs` with Axum server
+    - Implement `/validate` endpoint that pings all services
+    - Implement `/health` endpoint
+    - Add latency measurement and status classification (healthy, slow, offline)
+    - Implement in-memory cache for last known health state
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [x] 3.2 Create Rust Dockerfile and Cargo.toml
+    - Create Cargo.toml with axum, tokio, reqwest, serde dependencies
+    - Create multi-stage Dockerfile with rust builder
+    - _Requirements: 8.1_
+
+- [x] 4. Implement Go Load Simulator
+  - [x] 4.1 Create Go service with Gin
+    - Create `load-go/main.go` with Gin server
+    - Implement `/load/start` endpoint with goroutine-based load generation
+    - Implement `/load/stop` endpoint with graceful shutdown
+    - Implement `/load/status` endpoint returning load statistics
+    - Implement `/health` endpoint
+    - Add configurable RPS (1-1000) and target URL
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+  - [x] 4.2 Create Go Dockerfile and go.mod
+    - Create go.mod with gin-gonic dependency
+    - Create multi-stage Dockerfile with golang builder
+    - _Requirements: 8.1_
+
+- [x] 5. Implement C++ Chaos Engine
+  - [x] 5.1 Create C++ HTTP server with chaos endpoints
+    - Create `chaos-cpp/main.cpp` with cpp-httplib server
+    - Implement `/chaos/cpu` endpoint for CPU burn with duration limit (max 30s)
+    - Implement `/chaos/memory` endpoint for memory allocation (max 256MB)
+    - Implement `/health` endpoint
+    - Add safety limits and auto-release mechanisms
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+  - [x] 5.2 Create C++ Dockerfile and CMakeLists.txt
+    - Create CMakeLists.txt with cpp-httplib
+    - Create multi-stage Dockerfile with build tools
+    - _Requirements: 8.1_
+
+- [x] 6. Implement Java Rules Engine
+  - [x] 6.1 Create Spring Boot application with rules endpoint
+    - Create `rules-java/` with Spring Boot minimal setup
+    - Implement `/rules/evaluate` POST endpoint accepting metrics
+    - Implement mood determination logic with priority rules
+    - Implement `/health` endpoint
+    - Return mood, emoji, reason, and severity
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [x] 6.2 Create Java Dockerfile and pom.xml
+    - Create pom.xml with spring-boot-starter-web
+    - Create multi-stage Dockerfile with maven builder
+    - _Requirements: 8.1_
+
+- [x] 7. Implement Node.js API Gateway (Pet Brain)
+  - [x] 7.1 Create Express server with aggregation logic
+    - Create `api-node/src/index.js` with Express app
+    - Implement `/api/status` endpoint aggregating all service data
+    - Implement `/api/health` endpoint
+    - Add service client modules for calling each microservice
+    - Implement 3-second timeout for all service calls
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [x] 7.2 Implement proxy endpoints for chaos and load
+    - Implement `/api/chaos/cpu` proxying to C++ service
+    - Implement `/api/chaos/memory` proxying to C++ service
+    - Implement `/api/load/start` proxying to Go service
+    - Implement `/api/load/stop` proxying to Go service
+    - _Requirements: 1.1_
+  - [x] 7.3 Create Node.js Dockerfile and package.json
+    - Create package.json with express, axios, node-cron
+    - Create Dockerfile with node:18-alpine base
+    - _Requirements: 8.1_
+
+- [x] 8. Implement React Frontend Dashboard
+  - [x] 8.1 Create React app with Vite and base structure
+    - Initialize Vite React project in `frontend/`
+    - Set up TailwindCSS for styling
+    - Create App.jsx with main layout
+    - _Requirements: 7.1_
+  - [x] 8.2 Implement Pet component with mood visualization
+    - Create Pet.jsx component with emoji/SVG pet display
+    - Add mood-based animations and colors
+    - Display pet message based on current mood
+    - _Requirements: 7.1_
+  - [x] 8.3 Implement HealthBars component
+    - Create HealthBars.jsx with CPU, memory, error rate bars
+    - Add color coding based on status (green, yellow, red)
+    - _Requirements: 7.3_
+  - [x] 8.4 Implement ServiceStatus component
+    - Create ServiceStatus.jsx showing all service health indicators
+    - Display healthy/degraded/offline status for each service
+    - Show latency information
+    - _Requirements: 7.5_
+  - [x] 8.5 Implement ControlPanel with chaos buttons
+    - Create ControlPanel.jsx with Stress System and Load buttons
+    - Implement API calls to trigger chaos events
+    - Add loading states and feedback
+    - _Requirements: 7.4_
+  - [x] 8.6 Implement polling for live updates
+    - Add useEffect hook to poll /api/status every 3 seconds
+    - Update all components with fresh data
+    - _Requirements: 7.2_
+  - [x] 8.7 Create Frontend Dockerfile
+    - Create multi-stage Dockerfile with nginx for serving
+    - Configure nginx to proxy API requests to Node.js
+    - _Requirements: 8.1, 8.3_
+
+- [x] 9. Integration and final configuration
+  - [x] 9.1 Update docker-compose.yml with final configurations
+    - Verify all service dependencies are correct
+    - Add restart policies (max 3 retries)
+    - Ensure proper startup order
+    - _Requirements: 8.1, 8.4_
+  - [x] 9.2 Create comprehensive README.md
+    - Add project description and architecture diagram
+    - Include setup instructions (docker-compose up)
+    - Document all endpoints and features
+    - Add interview talking points
+    - _Requirements: 8.1_
+  - [x] 9.3 Add integration tests
+    - Create test script to verify all services communicate
+    - Test mood changes based on chaos events
+    - _Requirements: 1.1, 1.3, 1.4_

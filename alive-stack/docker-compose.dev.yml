@@ -1,0 +1,101 @@
+services:
+  # React Frontend - Dev mode with Vite hot reload
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+    depends_on:
+      - api
+    networks:
+      - alive-stack-network
+    environment:
+      - VITE_API_URL=http://api:3001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Node.js API Gateway - Dev mode with nodemon
+  api:
+    build:
+      context: ./api-node
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api-node/src:/app/src
+    depends_on:
+      - metrics
+      - validator
+      - load
+      - chaos
+      - rules
+    networks:
+      - alive-stack-network
+
+  # Python Metrics - Dev mode with uvicorn reload
+  metrics:
+    build:
+      context: ./metrics-python
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./metrics-python/main.py:/app/main.py
+    networks:
+      - alive-stack-network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Rust Health Validator - uses production build (hot reload impractical for Rust)
+  validator:
+    build:
+      context: ./validator-rust
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - alive-stack-network
+
+  # Go Load Simulator - Dev mode with air hot reload
+  load:
+    build:
+      context: ./load-go
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./load-go:/app
+    networks:
+      - alive-stack-network
+
+  # C++ Chaos Engine - Dev mode with entr file watching
+  chaos:
+    build:
+      context: ./chaos-cpp
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./chaos-cpp/main.cpp:/app/main.cpp
+      - ./chaos-cpp/CMakeLists.txt:/app/CMakeLists.txt
+    networks:
+      - alive-stack-network
+
+  # Java Rules Engine - Dev mode with Spring DevTools
+  rules:
+    build:
+      context: ./rules-java
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./rules-java/src:/app/src
+    networks:
+      - alive-stack-network
+
+networks:
+  alive-stack-network:
+    driver: bridge

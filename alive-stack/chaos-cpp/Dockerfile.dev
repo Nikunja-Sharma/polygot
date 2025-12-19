@@ -1,0 +1,31 @@
+# Development Dockerfile with entr for file watching
+FROM debian:bookworm-slim
+
+# Install build dependencies and entr for file watching
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libssl-dev \
+    entr \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy source files for initial build
+COPY CMakeLists.txt main.cpp ./
+
+# Initial build
+RUN mkdir -p build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Debug .. && \
+    cmake --build . --parallel
+
+# Copy watch script
+COPY watch.sh /app/watch.sh
+RUN chmod +x /app/watch.sh
+
+# Source will be mounted via volume
+EXPOSE 8003
+
+CMD ["/app/watch.sh"]

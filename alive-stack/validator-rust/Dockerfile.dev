@@ -1,0 +1,33 @@
+# Development Dockerfile - builds and runs the service
+# For Rust, hot reload is impractical; rebuild container on changes
+FROM rust:1.83-slim
+
+WORKDIR /app
+
+# Install dependencies for building
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy manifests first for dependency caching
+COPY Cargo.toml ./
+
+# Create dummy src to cache dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+
+# Build dependencies (this layer will be cached)
+RUN cargo build && rm -rf src
+
+# Copy actual source
+COPY src ./src
+
+# Build the application
+RUN cargo build
+
+# Source will be mounted via volume
+EXPOSE 8001
+
+# Run the debug binary
+CMD ["./target/debug/validator-rust"]
